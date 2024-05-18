@@ -29,4 +29,6 @@ def init_db():
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
     # from .deporte import DeporteEntity
+    from .eventos import Eventos
+    from .deporte import Deporte
     Base.metadata.create_all(bind=engine)
