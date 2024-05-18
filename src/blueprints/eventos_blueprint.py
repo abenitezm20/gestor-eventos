@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Blueprint, jsonify, make_response
-from src.commands.eventos.obtener_eventos import ObtenerEventosDeportivos
+from src.commands.eventos.obtener_eventos import ObtenerEventosDeportivos, ObtenerEventosAgendados
 from src.commands.eventos.registrar_eventos import RegistrarEvento
 from src.utils.seguridad_utils import DeportistaToken, token_required
 
@@ -29,4 +29,12 @@ def registrar_eventos(usuario_token: DeportistaToken, id: str):
             'id_evento': id,
         }
         result = RegistrarEvento(usuario_token, info).execute()
+    return make_response(jsonify(result), 200)
+
+
+@eventos_blueprint.route('/agendados', methods=['GET'])
+@token_required
+def obtener_eventos_registrados(usuario_token: DeportistaToken):
+    logger.info('Obteniendo todos los eventos agendados')
+    result = ObtenerEventosAgendados(usuario_token).execute()
     return make_response(jsonify(result), 200)
