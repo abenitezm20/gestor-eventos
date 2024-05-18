@@ -6,7 +6,9 @@ from unittest.mock import patch, MagicMock
 from faker import Faker
 from src.main import app
 from src.models.db import db_session
+from src.models.deporte import Deporte
 from src.models.deportista import Deportista, GeneroEnum, TipoIdentificacionEnum
+from src.models.eventos import Eventos
 
 fake = Faker()
 logger = logging.getLogger(__name__)
@@ -53,10 +55,32 @@ class TestEventos():
                 mock_post.return_value = mock_response
 
                 headers = {'Authorization': 'Bearer 123'}
+                
+                info_deporte = {
+                    'nombre': fake.name(),
+                }
+                deporte_random = Deporte(**info_deporte)
+                session.add(deporte_random)
+                session.commit()
+                deporte_id = deporte_random.id
+                
+                info_evento = {
+                    'id_deporte': deporte_id,
+                    'nombre': fake.name(),
+                    'descripcion': fake.text(),
+                    'fecha': fake.date_time(),
+                    'pais': fake.country(),
+                    'lugar': fake.city()
+                }
+                evento_random = Eventos(**info_evento)
+                session.add(evento_random)
+                session.commit()
 
                 response = test_client.get('/gestor-eventos/eventos/listar', headers=headers, follow_redirects=True)
 
                 assert response.status_code == 200
 
+                session.delete(evento_random)
+                session.delete(deporte_random)
                 session.delete(deportista_random)
                 session.commit()
