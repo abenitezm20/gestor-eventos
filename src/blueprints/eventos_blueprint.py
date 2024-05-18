@@ -13,7 +13,7 @@ eventos_blueprint = Blueprint('eventos', __name__)
 
 @eventos_blueprint.route('/listar', methods=['GET'])
 @token_required
-def obtener_eventos():
+def obtener_eventos(usuario_token: DeportistaToken):
     logger.info('Obteniendo todos los eventos deportivos')
     result = ObtenerEventosDeportivos().execute()
     return make_response(jsonify(result), 200)
