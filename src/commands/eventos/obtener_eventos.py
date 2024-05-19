@@ -15,39 +15,59 @@ logger = logging.getLogger(__name__)
 
 
 class ObtenerEventosDeportivos(BaseCommand):
-    def __init__(self):
+    def __init__(self, usuario_token: DeportistaToken):
         '''
         Constructor para el comando ObtenerEventosDeportivos
         '''
+        self.usuario_token: DeportistaToken = usuario_token
+
+        if str_none_or_empty(self.usuario_token.email):
+            logger.error("email no puede ser vacio o nulo")
+            raise BadRequest
 
     def execute(self):
         logger.info('Obteniendo todos los eventos')
 
         with db_session() as session:
-            eventos_bd = session.query(Eventos).all()
+            
+            deportista: Deportista = session.query(Deportista).filter_by(email=self.usuario_token.email).first()
+            
+            if deportista is None:
+                logger.error("Deportista no encontrado")
+                raise BadRequest
+            else:
+                eventos_bd = session.query(Eventos).all()
 
-            if eventos_bd is None or len(eventos_bd) == 0:
-                logger.error("No existen eventos configurados")
-                return []
+                if eventos_bd is None or len(eventos_bd) == 0:
+                    logger.error("No existen eventos configurados")
+                    return []
 
-            respuesta = []
+                respuesta = []
 
-            evento: Eventos
-            for evento in eventos_bd:
-                deporte: Deporte = session.query(Deporte).filter_by(id=evento.id_deporte).first()
+                eventos_agendados_bd = session.query(EventoDeportista).filter_by(id_deportista=deportista.id).all()
+                evento: Eventos
+                for evento in eventos_bd:
+                    deporte: Deporte = session.query(Deporte).filter_by(id=evento.id_deporte).first()
 
-                resp_tmp = {
-                    'id': evento.id,
-                    'nombre': evento.nombre,
-                    'descripcion': evento.descripcion,
-                    'fecha': evento.fecha,
-                    'lugar': evento.lugar,
-                    'pais': evento.pais,
-                    'deporte': deporte.nombre
-                }
-                respuesta.append(resp_tmp)
+                    resp_tmp = {
+                        'id': evento.id,
+                        'nombre': evento.nombre,
+                        'descripcion': evento.descripcion,
+                        'fecha': evento.fecha,
+                        'lugar': evento.lugar,
+                        'pais': evento.pais,
+                        'deporte': deporte.nombre,
+                        'registrado': 'no'
+                    }
 
-            return respuesta
+
+                    for evento_agendado in eventos_agendados_bd:
+                        if evento_agendado.id_evento == evento.id:
+                            resp_tmp['registrado'] = 'si'
+                            break
+                    respuesta.append(resp_tmp)
+
+                return respuesta
 
 
 class ObtenerEventosAgendados(BaseCommand):

@@ -15,7 +15,7 @@ eventos_blueprint = Blueprint('eventos', __name__)
 @token_required
 def obtener_eventos(usuario_token: DeportistaToken):
     logger.info('Obteniendo todos los eventos deportivos')
-    result = ObtenerEventosDeportivos().execute()
+    result = ObtenerEventosDeportivos(usuario_token).execute()
     return make_response(jsonify(result), 200)
 
 #El deportista registra un evento
