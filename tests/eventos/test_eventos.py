@@ -338,36 +338,11 @@ class TestEventos():
                 session.add(deporte_random)
                 session.commit()
                 deporte_id = deporte_random.id
-                
-                # #se crea el evento
-                # info_evento = {
-                #     'id_deporte': deporte_id,
-                #     'nombre': fake.name(),
-                #     'descripcion': fake.text(),
-                #     'fecha': fake.date_time(),
-                #     'pais': fake.country(),
-                #     'lugar': fake.city()
-                # }
-                # evento_random = Eventos(**info_evento)
-                # session.add(evento_random)
-                # session.commit()
-                # evento_id = evento_random.id
-
-                # #Se asocia el evento al deportista
-                # info_evento_deportista = {
-                #     'id_deportista': deportista_random.id,
-                #     'id_evento': evento_id
-                # }
-                # evento_deportista_random = EventoDeportista(**info_evento_deportista)
-                # session.add(evento_deportista_random)
-                # session.commit()
 
                 response = test_client.get('/gestor-eventos/eventos/agendados', headers=headers, follow_redirects=True)
                 assert response.status_code == 200
                 assert response.json == []
 
-                #session.delete(evento_deportista_random)
-                #session.delete(evento_random)
                 session.delete(deporte_random)
                 session.delete(deportista_random)
                 session.commit()
