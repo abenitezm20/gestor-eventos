@@ -53,7 +53,7 @@ class ObtenerEventosDeportivos(BaseCommand):
                         'id': evento.id,
                         'nombre': evento.nombre,
                         'descripcion': evento.descripcion,
-                        'fecha': evento.fecha,
+                        'fecha': evento.fecha.strftime("%Y-%m-%dT%H:%M:%S"),
                         'lugar': evento.lugar,
                         'pais': evento.pais,
                         'deporte': deporte.nombre,
